@@ -1,0 +1,7 @@
+# This file makes sure the indenting style is the same across all IDEs and users
+root = true
+
+[*.{js}]
+indent_style = space
+indent_size = 2
+max_line_length = 100

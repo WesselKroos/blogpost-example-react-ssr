@@ -1,0 +1,45 @@
+{
+  "name": "blogpost-example-react-ssr",
+  "version": "1.0.0",
+  "description": "Loading the right data on the server-side with respect to nested components, react-redux (and react-router)",
+  "main": "build/server.bundle.js",
+  "scripts": {
+    "start": "cross-env yarn build-server-dev && yarn start-server",
+    "prestart": "yarn install && yarn clean",
+    "clean": "rimraf public/assets/webpack-hmr && rimraf public/assets/__webpack-hmr",
+    "build": "cd src && cross-env webpack --config webpack.server.config.js --config webpack.client.config.js --mode production",
+    "build-server-dev": "cd src && cross-env webpack --config webpack.server.config.js --mode development",
+    "start-server": "cd build && node server.bundle.js"
+  },
+  "private": true,
+  "author": "Wessel Kroos",
+  "devDependencies": {
+    "@babel/core": "^7.1.2",
+    "@babel/plugin-proposal-class-properties": "^7.1.0",
+    "@babel/preset-env": "^7.3.1",
+    "@babel/preset-react": "^7.0.0",
+    "babel-loader": "^8.0.4",
+    "core-js": "^2.6.5",
+    "react": "16.8.4",
+    "react-dom": "16.8.4",
+    "react-hot-loader": "^4.7.0",
+    "react-redux": "^6.0.0",
+    "react-router": "^4.3.1",
+    "react-router-dom": "^4.3.1",
+    "redux": "^4.0.1",
+    "redux-thunk": "^2.3.0",
+    "rimraf": "^2.6.3",
+    "serialize-javascript": "^1.6.1",
+    "uglifyjs-webpack-plugin": "^2.1.2",
+    "webpack": "^4.20.2",
+    "webpack-cli": "^3.1.2",
+    "webpack-dev-middleware": "^3.5.1",
+    "webpack-hot-middleware": "^2.24.3",
+    "webpack-strip-block": "^0.2.0"
+  },
+  "dependencies": {
+    "cross-env": "^5.2.0",
+    "express": "^4.16.4",
+    "node-fetch": "^2.3.0"
+  }
+}
