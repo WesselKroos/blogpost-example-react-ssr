@@ -5,22 +5,16 @@ import RenderServerside from '../components/RenderServerside';
 import App from '../components/App';
 import getStore, { clearStore } from '../store';
 
-export const loadStoreData = req =>
-  new Promise((resolve, reject) => {
-    const url = req.originalUrl || req.url;
-    const store = getStore();
+export const loadStoreData = async req => {
+  const url = req.originalUrl || req.url;
+  const store = getStore();
 
-    App.preInitStore(store, url)
-      .then(() => {
-        resolve({
-          renderedString: renderToString(
-            <RenderServerside store={store} location={url} />
-          ),
-          state: store.getState()
-        });
-      })
-      .catch((...args) => reject(...args));
-  });
+  await App.preInitStore(store, url);
+  return {
+    renderedString: renderToString(<RenderServerside store={store} location={url} />),
+    state: store.getState()
+  };
+};
 
 export const clearData = () => {
   clearStore();

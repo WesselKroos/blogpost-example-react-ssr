@@ -6,18 +6,16 @@ import routes from '../../utils/routes';
 
 export class Routing extends Component {
   /* SERVERSIDE-ONLY:START */
-  static preInitStore(store, url) {
-    return new Promise((resolve, reject) => {
-      const route = routes.find(route => matchPath(url, {
+  static async preInitStore(store, url) {
+    const route = routes.find(route =>
+      matchPath(url, {
         exact: true,
         path: route.path
-      }));
-      if (!route || !route.Component || !route.Component.preInitStore) return resolve();
+      })
+    );
+    if (!route || !route.Component || !route.Component.preInitStore) return;
 
-      Promise.resolve(route.Component.preInitStore(store, url))
-        .then(resolve)
-        .catch(reject);
-    });
+    await route.Component.preInitStore(store, url);
   }
   /* SERVERSIDE-ONLY:END */
 
@@ -34,4 +32,9 @@ export class Routing extends Component {
   }
 }
 
-export default withRouter(connect(null,null)(Routing));
+export default withRouter(
+  connect(
+    null,
+    null
+  )(Routing)
+);

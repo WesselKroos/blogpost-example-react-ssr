@@ -1,4 +1,4 @@
-# Flexible state fetching in React on the server-side with react-router and react-redux
+# How to load the correct data on the server-side with respect to nested components, react-redux and react-router
 
 This is the complete solution regarding a blogpost I made for TrueLime. You can view the blogpost here: http://blogs.truelime.nl
 

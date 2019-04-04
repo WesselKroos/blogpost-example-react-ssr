@@ -3,14 +3,9 @@ import { connect } from 'react-redux';
 import { fetchDetail } from '../../actions/detail';
 
 class DetailPage extends Component {
-
   /* SERVERSIDE-ONLY:START */
-  static preInitStore(store, url) {
-    return new Promise((resolve, reject) => {
-      Promise.resolve(store.dispatch(fetchDetail()))
-        .then(resolve)
-        .catch(reject);
-    });
+  static async preInitStore(store, url) {
+    await store.dispatch(fetchDetail());
   }
   /* SERVERSIDE-ONLY:END */
 
@@ -24,20 +19,21 @@ class DetailPage extends Component {
   render() {
     let { loading, error, content } = this.props;
 
-    if(loading) {
-      return <div>Fetching the detail data...</div>
+    if (loading) {
+      return <div>Fetching the detail data...</div>;
     }
 
-    if(error) {
+    if (error) {
       return (
         <div>
-          Could not fetch the detail data<br/>
+          Could not fetch the detail data
+          <br />
           <button onClick={this.props.fetchDetail}>Retry fetching the detail data</button>
         </div>
-      )
+      );
     }
 
-    if(!content) {
+    if (!content) {
       return <button onClick={this.props.fetchDetail}>Fetch the detail data</button>;
     }
 
@@ -50,7 +46,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = {
-  fetchDetail,
+  fetchDetail
 };
 
 export default connect(

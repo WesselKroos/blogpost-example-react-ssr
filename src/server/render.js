@@ -1,16 +1,14 @@
+import serialize from 'serialize-javascript';
+import { getHashedPaths } from '../utils/versioning';
 
-import serialize from "serialize-javascript";
-import { getHashedPaths } from '../utils/versioning'
-
-export default (
-  initialRender,
-  initialState = {}
-) => new Promise((resolve, reject) => {
+export default async (initialRender, initialState = {}) => {
   console.log('Rendering webpage');
-  const paths = {
+  let paths = {
     script: '/assets/client.bundle.js'
-  }
-  getHashedPaths(paths).then((paths) => resolve(`
+  };
+  paths = await getHashedPaths(paths);
+
+  return `
 <!DOCTYPE html>
 <html>
   <head>
@@ -44,5 +42,5 @@ export default (
     <script src="${paths.script}" defer async></script>
   </body>
 </html>
-  `))
-})
+  `;
+};

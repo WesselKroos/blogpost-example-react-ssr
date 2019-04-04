@@ -7,29 +7,34 @@ export const getFileHash = (path, basedOnLength = false) =>
     if (basedOnLength) {
       shasum.update(fs.statSync(path).size.toString());
       const hash = shasum.digest('hex');
-      resolve(hash)
+      resolve(hash);
     } else {
       const stream = fs.ReadStream(path);
-      stream.on('data', (data) => { shasum.update(data); });
+      stream.on('data', data => {
+        shasum.update(data);
+      });
       stream.on('end', () => {
         const hash = shasum.digest('hex');
-        resolve(hash)
+        resolve(hash);
       });
       stream.on('error', reject);
     }
-  })
-
-export const getHashedPath = (path, basedOnLength) =>
-  new Promise((resolve, reject) => {
-    getFileHash(`${path}`, basedOnLength).then((hash) => {
-      resolve(`${path}?v=${hash}`)
-    }).catch(reject)
-  })
-
-export const getHashedPaths = (paths) => new Promise((resolve, reject) => {
-  const promises = []
-  Object.keys(paths).forEach((name) => {
-    promises.push(getHashedPath(paths[name]).then((path) => paths[name] = path))
   });
-  Promise.all(promises).then(resolve(paths)).catch(reject)
-})
+
+export const getHashedPath = async (path, basedOnLength) => {
+  path = `../public${path}`;
+  const hash = await getFileHash(`${path}`, basedOnLength);
+  return `${path}?v=${hash}`;
+};
+
+export const getHashedPaths = async paths => {
+  const promises = [];
+  Object.keys(paths).forEach(name => {
+    promises.push(async () => {
+      const path = await getHashedPath(paths[name]);
+      paths[name] = path;
+    });
+  });
+  await Promise.all(promises);
+  return paths;
+};

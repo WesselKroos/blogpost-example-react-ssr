@@ -28,66 +28,45 @@ if (DEVELOPMENT) {
 app.use('/assets', express.static('../public/assets'));
 
 //Dynamic files
-app.use(/\/((?!assets).)*/, (req, res, next) => {
-  console.log(`Received request for ${req.originalUrl || req.url}`);
+app.use('/*', async (req, res, next) => {
+  const url = req.originalUrl || req.url;
+  console.log(`Received request for ${url}`);
 
-  //skip if the browser did not request a html page
+  //Skip if the browser did not request a html page
   if (req.headers.accept.indexOf('text/html') === -1) return next();
 
-  //Process content
-  const prepare = !prerender
-    ? render()
-    : new Promise((resolve, reject) => {
-        console.log('Loading data');
-        prerendering
-          .loadStoreData(req)
-          .then(({ renderedString, state }) => render(renderedString, state))
-          .then(resolve)
-          .catch(reject);
-      });
+  //Skip if request to the assets folder
+  if (url.indexOf('/assets/') === 0) return next();
 
-  //Remove the store
-  const cleanup = prerender ? () => prerendering.clearData() : () => {};
+  try {
+    //Process content
+    console.log('Loading data');
+    const data = prerender ? await prerendering.loadStoreData(req) : {};
+    const { renderedString, state } = data;
+    const html = await render(renderedString, state);
 
-  //Send response
-  prepare
-    .then(html => {
-      console.log(`Sending response for ${req.originalUrl || req.url}`);
-      if (html) res.send(html);
-      cleanup();
-    })
-    .catch(error => {
-      cleanup();
-      next(error);
-    });
+    //Send response
+    console.log(`Sending response for ${url}`);
+    res.send(html);
+
+    //Remove the store
+    if (prerender) prerendering.clearData();
+  } catch (error) {
+    next(error);
+  }
 });
 
-//Throw an error if no path matches
-app.use('*', (req, res, next) => {
-  const error = new Error(`Cannot not find "${req.originalUrl || req.url}"`);
-  error.code = 404;
-  throw error;
+// 404 - Not found
+app.get('/*', (req, res, next) => {
+  console.warn('Route not found:', req.originalUrl || req.url);
+  res.status(404);
+  res.send(`Cannot find "${req.originalUrl || req.url}"`);
 });
 
-//Return the error response
+// Error handler
 app.use((error, req, res, next) => {
-  error.code = error.code || 500;
-  res.status(error.code);
-
-  if (error.code >= 500 && error.code < 600) {
-    console.error(`${error.code} Server`, error.stack);
-  }
-
-  //HTML
-  if ((req.headers.accept || '').indexOf('text/html') !== -1) {
-    res.send(`<style>body { font-family: arial; }</style><h1>${error.code} Server error</h1><b>${error.name}:</b><h2><i>${error.message}</i></h2><b>Stack Trace:</b><pre>${error.stack}</pre>`);
-    return;
-  }
-
-  //DEFAULT
-  let mimeType = (req.headers.accept || '').split(',')[0] || 'text';
-  mimeType = mimeType === '*/*' ? 'text' : mimeType;
-  res.type(mimeType).send(`Server error: ${error.code}`);
+  console.error(`500 Server error: ${error.message}`, error.stack);
+  res.status(500).end();
 });
 
 app.listen(process.env.PORT || 3000, () => {

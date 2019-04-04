@@ -1,6 +1,5 @@
 const path = require('path');
 const webpack = require('webpack');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 const clientConfig = DEVELOPMENT => {
   const sharedConfig = require('./webpack.shared.config.js')(DEVELOPMENT);
@@ -14,17 +13,6 @@ const clientConfig = DEVELOPMENT => {
       publicPath: 'assets/',
       hotUpdateChunkFilename: '__webpack-hmr/[hash].hot-update.js',
       hotUpdateMainFilename: '__webpack-hmr/[hash].hot-update.json'
-    },
-    optimization: {
-      minimizer: [
-        new UglifyJsPlugin({
-          uglifyOptions: {
-            output: {
-              comments: DEVELOPMENT
-            }
-          }
-        })
-      ]
     },
     module: {
       rules: [

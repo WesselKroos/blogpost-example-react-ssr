@@ -8,9 +8,9 @@ import routes from '../../utils/routes';
 
 class App extends Component {
   /* SERVERSIDE-ONLY:START */
-  static preInitStore(store, url) {
-    return Promise.resolve(store.dispatch(fetchGeneral()))
-      .then(() => Routing.preInitStore(store, url));
+  static async preInitStore(store, url) {
+    await store.dispatch(fetchGeneral());
+    await Routing.preInitStore(store, url);
   }
   /* SERVERSIDE-ONLY:END */
 
